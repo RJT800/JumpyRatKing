@@ -7,9 +7,18 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField]
-    private float _acceleration;
-    [SerializeField]
     private float _maxSpeed;
+    [SerializeField]
+    private float _acceleration;
+
+    [SerializeField]
+    private float _jumpHeight;
+
+    [SerializeField]
+    private Vector3 _groundCheck;
+
+    [SerializeField]
+    private float _groundCheckRadius;
 
     [SerializeField, Tooltip("How much vertical force is applied when jumping")]
     private float _jumpForce;
@@ -17,7 +26,8 @@ public class PlayerController : MonoBehaviour
     private Rigidbody _rigidbody;
 
     private Vector3 _moveDirection;
-    private bool _isGrounded;
+    private bool _jumpInput = false;
+    private bool _isGrounded = false;
 
     public float Speed
     {
@@ -43,7 +53,7 @@ public class PlayerController : MonoBehaviour
     {
 
         _moveDirection = new Vector3(Input.GetAxisRaw("Horizontal"), 0, 0);
-
+        _jumpInput = Input.GetAxisRaw("Jump") != 0;
 
         //float moveInput = Input.GetAxisRaw("Horizontal");
         //float jumpInput = 0;
@@ -60,16 +70,38 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        //gound check
+        _isGrounded = Physics.OverlapSphere(transform.position + _groundCheck, _groundCheckRadius).Length > 1;
         //add movement force
         _rigidbody.AddForce(_moveDirection * _acceleration * Time.fixedDeltaTime, ForceMode.VelocityChange);
 
         //clamp velocity to _maxspeed
-        if (_rigidbody.velocity.magnitude > _maxSpeed)
-            _rigidbody.velocity = _rigidbody.velocity.normalized * _maxSpeed;
+        Vector3 velocity = _rigidbody.velocity;
+        float newXSpeed = Mathf.Clamp(_rigidbody.velocity.x, -_maxSpeed, _maxSpeed);
+        velocity.x = newXSpeed;
+        _rigidbody.velocity = velocity;
+
+        //add jump force
+        if(_jumpInput&& _isGrounded)
+        {
+            //Calculate force needed to reach _jumpHeight
+            float force = Mathf.Sqrt(_jumpHeight * -2f * Physics.gravity.y);
+            _rigidbody.AddForce(Vector3.up * force, ForceMode.Impulse);
+        }
+        
     }
 
-    private void OnTriggerEnter(Collider other)
+
+#if UNITY_EDITOR
+    private void OnDrawGizmosSelected()
     {
-        _isGrounded = true;
+        //draw ground check 
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position + _groundCheck, _groundCheckRadius);
     }
+#endif
+    //private void OnTriggerEnter(Collider other)
+    //{
+    //    _isGrounded = true;
+    //}
 }
