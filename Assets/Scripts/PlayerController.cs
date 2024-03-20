@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -7,27 +8,51 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField]
+    private bool _isPlayerOne = true;
+
+    private Rigidbody _rigidbody;
+
+    [SerializeField]
+    private Vector3 _moveDirection;
+    [SerializeField]
     private float _maxSpeed;
     [SerializeField]
     private float _acceleration;
 
+    [Space]
+
+    [SerializeField]
+    private bool _jumpInput = false;
     [SerializeField]
     private float _jumpHeight;
+    [SerializeField, Tooltip("How much vertical force is applied when jumping")]
+    private float _jumpForce;
 
     [SerializeField]
     private Vector3 _groundCheck;
 
     [SerializeField]
     private float _groundCheckRadius;
+    [SerializeField]
 
-    [SerializeField, Tooltip("How much vertical force is applied when jumping")]
-    private float _jumpForce;
-
-    private Rigidbody _rigidbody;
-
-    private Vector3 _moveDirection;
-    private bool _jumpInput = false;
     private bool _isGrounded = false;
+
+    [SerializeField]
+    private Vector3 _wallCheck;
+    //[SerializeField]
+
+    //private Vector2 _wallchecc;
+    //private Vector4 _wallChecd;
+
+    [SerializeField]
+    private float _wallCheckRadius;
+
+    [SerializeField]
+    private bool _isWalled = false;
+
+    [SerializeField]
+    private float _canWallJump = 0f;
+
 
     public float Speed
     {
@@ -52,8 +77,20 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
 
-        _moveDirection = new Vector3(Input.GetAxisRaw("Horizontal"), 0, 0);
-        _jumpInput = Input.GetAxisRaw("Jump") != 0;
+
+        //_moveDirection = new Vector3(Input.GetAxisRaw("P" + (_isPlayerOne ? "1" : "2") + " Hori", 0, 0);
+
+        if (_isPlayerOne)
+        {
+            _moveDirection = new Vector3(Input.GetAxisRaw("P1 Hori"), 0, 0);
+            _jumpInput = Input.GetAxisRaw("P1 Vert") != 0;
+        }
+        else
+        {
+
+            _moveDirection = new Vector3(Input.GetAxisRaw("P2 Hori"), 0, 0);
+            _jumpInput = Input.GetAxisRaw("P2 Vert") != 0;
+        }
 
         //float moveInput = Input.GetAxisRaw("Horizontal");
         //float jumpInput = 0;
@@ -75,6 +112,23 @@ public class PlayerController : MonoBehaviour
         //add movement force
         _rigidbody.AddForce(_moveDirection * _acceleration * Time.fixedDeltaTime, ForceMode.VelocityChange);
 
+        //wall check 
+        _isWalled = Physics.OverlapSphere(transform.position + _wallCheck, _wallCheckRadius).Length > 1;
+
+        if (_isGrounded)
+            _canWallJump = 0;
+        else if (_isWalled)
+            _canWallJump = 1;
+        else if (_isWalled && _isGrounded)
+            _canWallJump = 2;
+        else if (!_isGrounded && _isWalled)
+            _canWallJump = 3;
+
+
+        //0 means only grounded, 1 means walled, 2 means walled and grounded, 3 means off ground and walled but just jumped
+        //_canWallJump = _isWalled && !_isGrounded;
+
+
         //clamp velocity to _maxspeed
         Vector3 velocity = _rigidbody.velocity;
         float newXSpeed = Mathf.Clamp(_rigidbody.velocity.x, -_maxSpeed, _maxSpeed);
@@ -82,11 +136,26 @@ public class PlayerController : MonoBehaviour
         _rigidbody.velocity = velocity;
 
         //add jump force
-        if(_jumpInput&& _isGrounded)
+        if(_jumpInput&& _isGrounded/* || _jumpInput && _isWalled*/ /*|| _jumpInput && _offWall*/)
         {
-            //Calculate force needed to reach _jumpHeight
-            float force = Mathf.Sqrt(_jumpHeight * -2f * Physics.gravity.y);
-            _rigidbody.AddForce(Vector3.up * force, ForceMode.Impulse);
+
+            if (_canWallJump == 0 || _canWallJump == 1 || _canWallJump == 2/*|| _canWallJump ==3*/)
+            {
+
+                    //Calculate force needed to reach _jumpHeight
+                    float force = Mathf.Sqrt(_jumpHeight * -2f * Physics.gravity.y);
+                    _rigidbody.AddForce(Vector3.up * force, ForceMode.Impulse);
+
+
+                if (_isWalled)
+                {
+                    _canWallJump = 3;
+                }
+
+            }
+            
+
+            
         }
         
     }
@@ -98,6 +167,9 @@ public class PlayerController : MonoBehaviour
         //draw ground check 
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position + _groundCheck, _groundCheckRadius);
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position + _wallCheck, _wallCheckRadius);
+        
     }
 #endif
     //private void OnTriggerEnter(Collider other)
