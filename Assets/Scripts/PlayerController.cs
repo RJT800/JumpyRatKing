@@ -128,6 +128,8 @@ public class PlayerController : MonoBehaviour
         //0 means only grounded, 1 means walled, 2 means walled and grounded, 3 means off ground and walled but just jumped
         //_canWallJump = _isWalled && !_isGrounded;
 
+        //maybe do a wall cling check or something?
+
 
         //clamp velocity to _maxspeed
         Vector3 velocity = _rigidbody.velocity;
@@ -138,6 +140,8 @@ public class PlayerController : MonoBehaviour
         //add jump force
         if(_jumpInput&& _isGrounded/* || _jumpInput && _isWalled*/ /*|| _jumpInput && _offWall*/)
         {
+
+            if (_canWallJump ==)
 
             if (_canWallJump == 0 || _canWallJump == 1 || _canWallJump == 2/*|| _canWallJump ==3*/)
             {
