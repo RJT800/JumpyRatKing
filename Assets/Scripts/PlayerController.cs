@@ -50,9 +50,17 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private bool _isWalled = false;
 
+    private bool _wallClinged = false;
+
     [SerializeField]
     private float _canWallJump = 0f;
 
+    [SerializeField]
+    private bool _canJump = true;
+
+    [SerializeField]
+
+    private bool _alreadyJumped = false;
 
     public float Speed
     {
@@ -115,6 +123,9 @@ public class PlayerController : MonoBehaviour
         //wall check 
         _isWalled = Physics.OverlapSphere(transform.position + _wallCheck, _wallCheckRadius).Length > 1;
 
+
+
+
         if (_isGrounded)
             _canWallJump = 0;
         else if (_isWalled)
@@ -138,25 +149,43 @@ public class PlayerController : MonoBehaviour
         _rigidbody.velocity = velocity;
 
         //add jump force
-        if(_jumpInput&& _isGrounded/* || _jumpInput && _isWalled*/ /*|| _jumpInput && _offWall*/)
+        if(_jumpInput/*&& _isGrounded /* || _jumpInput && _isWalled*/ /*|| _jumpInput && _offWall*/)
         {
+            //bool for if a one condition for jumping is meant to prevent additional jumping
+            //bool alreadyJumped = false;
+            //check
 
-            if (_canWallJump ==)
-
-            if (_canWallJump == 0 || _canWallJump == 1 || _canWallJump == 2/*|| _canWallJump ==3*/)
+            if (_isGrounded && _alreadyJumped == false)
             {
-
-                    //Calculate force needed to reach _jumpHeight
-                    float force = Mathf.Sqrt(_jumpHeight * -2f * Physics.gravity.y);
-                    _rigidbody.AddForce(Vector3.up * force, ForceMode.Impulse);
-
-
-                if (_isWalled)
-                {
-                    _canWallJump = 3;
-                }
-
+                //Calculate force needed to reach _jumpHeight
+                float force = Mathf.Sqrt(_jumpHeight * -2f * Physics.gravity.y);
+                _rigidbody.AddForce(Vector3.up * force, ForceMode.Impulse);
+                _alreadyJumped = true;
             }
+
+            if (_wallClinged&&_alreadyJumped == false)
+            {
+                //Calculate force needed to reach _jumpHeight
+                float force = Mathf.Sqrt(_jumpHeight * -2f * Physics.gravity.y);
+                _rigidbody.AddForce(Vector3.up * force, ForceMode.Impulse);
+                _alreadyJumped = true;
+            }
+
+            
+
+        ////wall cling
+        //_wallClinged = _isWalled == true && _isGrounded == false;
+
+
+        //    if (_isGrounded || _isWalled ||_wallClinged)
+        //    {
+
+        //        //Calculate force needed to reach _jumpHeight
+        //        float force = Mathf.Sqrt(_jumpHeight * -2f * Physics.gravity.y);
+        //        _rigidbody.AddForce(Vector3.up * force, ForceMode.Impulse);
+        //        _wallClinged = false;
+        //    }
+
             
 
             
