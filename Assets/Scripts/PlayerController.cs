@@ -23,6 +23,9 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     private bool _jumpInput = false;
+
+    [SerializeField]
+    private bool _jumpBeenInputted = false;
     [SerializeField]
     private float _jumpHeight;
     [SerializeField, Tooltip("How much vertical force is applied when jumping")]
@@ -39,10 +42,7 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     private Vector3 _wallCheck;
-    //[SerializeField]
 
-    //private Vector2 _wallchecc;
-    //private Vector4 _wallChecd;
 
     [SerializeField]
     private float _wallCheckRadius;
@@ -50,18 +50,22 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private bool _isWalled = false;
 
-    private bool _wallClinged = false;
+    [SerializeField]
+    private bool _leftWall = false;
+
 
     [SerializeField]
-    private float _canWallJump = 0f;
+    private float _jumpsLeft = 1f;
 
     [SerializeField]
     private bool _canJump = true;
 
     [SerializeField]
+    private bool _canJumpAgain = true;
 
-    private bool _alreadyJumped = false;
 
+
+    
     public float Speed
     {
         get => _maxSpeed;
@@ -100,21 +104,17 @@ public class PlayerController : MonoBehaviour
             _jumpInput = Input.GetAxisRaw("P2 Vert") != 0;
         }
 
-        //float moveInput = Input.GetAxisRaw("Horizontal");
-        //float jumpInput = 0;
-        //if (Input.GetKeyDown(KeyCode.Space)&& _isGrounded)
-        //{
-        //    jumpInput = 1;
-        //    _isGrounded = false;
-        //}
-
-        //_rigidbody.AddForce(Vector3.right * moveInput * _maxSpeed * Time.deltaTime);
-        //_rigidbody.AddForce(Vector3.up * jumpInput * _jumpForce * Time.deltaTime);
-
+        
     }
 
     private void FixedUpdate()
     {
+
+        if (_jumpBeenInputted==true)
+        {
+            if (_jumpInput == false)
+                _jumpBeenInputted = false;
+        }
         //gound check
         _isGrounded = Physics.OverlapSphere(transform.position + _groundCheck, _groundCheckRadius).Length > 1;
         //add movement force
@@ -124,71 +124,74 @@ public class PlayerController : MonoBehaviour
         _isWalled = Physics.OverlapSphere(transform.position + _wallCheck, _wallCheckRadius).Length > 1;
 
 
-
-
-        if (_isGrounded)
-            _canWallJump = 0;
-        else if (_isWalled)
-            _canWallJump = 1;
-        else if (_isWalled && _isGrounded)
-            _canWallJump = 2;
-        else if (!_isGrounded && _isWalled)
-            _canWallJump = 3;
-
-
-        //0 means only grounded, 1 means walled, 2 means walled and grounded, 3 means off ground and walled but just jumped
-        //_canWallJump = _isWalled && !_isGrounded;
-
-        //maybe do a wall cling check or something?
-
-
         //clamp velocity to _maxspeed
         Vector3 velocity = _rigidbody.velocity;
         float newXSpeed = Mathf.Clamp(_rigidbody.velocity.x, -_maxSpeed, _maxSpeed);
         velocity.x = newXSpeed;
         _rigidbody.velocity = velocity;
 
-        //add jump force
-        if(_jumpInput/*&& _isGrounded /* || _jumpInput && _isWalled*/ /*|| _jumpInput && _offWall*/)
+
+        if (_isGrounded == true)
         {
-            //bool for if a one condition for jumping is meant to prevent additional jumping
-            //bool alreadyJumped = false;
-            //check
+            _canJump = true;
+            _canJumpAgain = false;
+        }
+        else
+        {
+            _canJump = false;
+        }
 
-            if (_isGrounded && _alreadyJumped == false)
-            {
-                //Calculate force needed to reach _jumpHeight
-                float force = Mathf.Sqrt(_jumpHeight * -2f * Physics.gravity.y);
-                _rigidbody.AddForce(Vector3.up * force, ForceMode.Impulse);
-                _alreadyJumped = true;
-            }
-
-            if (_wallClinged&&_alreadyJumped == false)
-            {
-                //Calculate force needed to reach _jumpHeight
-                float force = Mathf.Sqrt(_jumpHeight * -2f * Physics.gravity.y);
-                _rigidbody.AddForce(Vector3.up * force, ForceMode.Impulse);
-                _alreadyJumped = true;
-            }
-
-            
-
-        ////wall cling
-        //_wallClinged = _isWalled == true && _isGrounded == false;
+        if (_isWalled == true)
+        {
+            _leftWall = false;
+        }
 
 
-        //    if (_isGrounded || _isWalled ||_wallClinged)
-        //    {
 
-        //        //Calculate force needed to reach _jumpHeight
-        //        float force = Mathf.Sqrt(_jumpHeight * -2f * Physics.gravity.y);
-        //        _rigidbody.AddForce(Vector3.up * force, ForceMode.Impulse);
-        //        _wallClinged = false;
-        //    }
+        if (_isWalled == true && _isGrounded == false)
+        {
+            _canJumpAgain = true;
 
-            
+        }
+        else
+            _canJumpAgain = false;
 
-            
+        //if (_leftWall == true && _isGrounded == false)
+        //{
+        //    _canJumpAgain = true;
+        //}
+        //else
+        //    _canJumpAgain = false;
+
+        //Invoke("_jumpInput", 0.02f);
+
+
+
+
+
+
+
+
+
+
+        //add jump force
+        if (_jumpInput == true && _jumpBeenInputted !=true&& _canJump == true || _jumpInput == true && _canJumpAgain == true &&_jumpBeenInputted != true&& _jumpsLeft > 0)
+        {
+
+            //Calculate force needed to reach _jumpHeight
+            float force = Mathf.Sqrt(_jumpHeight * -2f * Physics.gravity.y);
+            _rigidbody.AddForce(Vector3.up * force, ForceMode.Impulse);
+
+            if (_isGrounded == false)
+                _jumpsLeft--;
+
+
+            _jumpBeenInputted = true;
+        }
+
+        if (_isGrounded ==true)
+        {
+            _jumpsLeft = 3;
         }
         
     }

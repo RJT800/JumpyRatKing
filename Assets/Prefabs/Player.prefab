@@ -122,15 +122,19 @@ MonoBehaviour:
   _maxSpeed: 3
   _acceleration: 1000
   _jumpInput: 0
-  _jumpHeight: 2
-  _jumpForce: 100
-  _groundCheck: {x: 0, y: -0.93, z: 0}
+  _jumpBeenInputted: 0
+  _jumpHeight: 5
+  _jumpForce: 200000
+  _groundCheck: {x: 0, y: -0.89, z: 0}
   _groundCheckRadius: 0.13
   _isGrounded: 0
   _wallCheck: {x: 0, y: 0, z: 0}
   _wallCheckRadius: 0.6
   _isWalled: 0
-  _canWallJump: 0
+  _leftWall: 0
+  _jumpsLeft: 3
+  _canJump: 1
+  _canJumpAgain: 1
 --- !u!136 &1683016288361077568
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -285,6 +289,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isTagged: 0
   _canBeTagged: 1
+  _taggedParticles: {fileID: 8071717399085638175}
 --- !u!1 &8359110281466862991
 GameObject:
   m_ObjectHideFlags: 0
@@ -335,7 +340,7 @@ ParticleSystem:
   emitterVelocityMode: 1
   looping: 0
   prewarm: 0
-  playOnAwake: 1
+  playOnAwake: 0
   useUnscaledTime: 0
   autoRandomSeed: 1
   startDelay:

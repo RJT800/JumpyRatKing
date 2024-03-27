@@ -25,8 +25,7 @@ public class PlayerTagBehavior : MonoBehaviour
         _canBeTagged = false;
 
 
-        //OnParticleCollision()
-        
+        _taggedParticles.Play();
 
         TrailRenderer trail = GetComponent<TrailRenderer>();
         if (trail != null)
