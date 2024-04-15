@@ -46,7 +46,8 @@ public class PlayerTagBehavior : MonoBehaviour
 
     private void Start()
     {
-        OnTagged.AddListener(SetCanBeTagged);
+
+            
         //get the trail renderer
         TrailRenderer trail = GetComponent<TrailRenderer>();
         if (trail == null) return;
@@ -61,42 +62,26 @@ public class PlayerTagBehavior : MonoBehaviour
     {
         //if not it, do nothing
         if (!IsTagged) return;
-        //Debug.Log("1");
 
         //get the player tag behavior from what we hit
         PlayerTagBehavior tagBehavior = collision.gameObject.GetComponent<PlayerTagBehavior>();
-        //Debug.Log("2");
 
         //if it didn't have one, return;
         if (tagBehavior == null) return;
-        //Debug.Log("3");
+
         //tag other player
         if(!tagBehavior.Tag())  return;
 
         //set yourslef as not it
         _isTagged = false;
         _canBeTagged = false;
-        //Debug.Log("4");
 
         //turn off our trail renderer
         TrailRenderer trailRenderer = GetComponent<TrailRenderer>();
         if (trailRenderer != null)
         {
             trailRenderer.enabled = false;
-        }
-
-
-
-        //if (TryGetComponent(out TrailRenderer trail))
-        //{
-        //    Debug.Log("5");
-
-        //    trail.enabled = false;
-        //}
-        //GetComponent<TrailRenderer>().enabled = false;
-
-
-        
+        }        
     }
 
     private void OnCollisionExit(Collision collision)

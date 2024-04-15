@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 1683016288361077568}
   - component: {fileID: 5294873679431838770}
   - component: {fileID: 3441048352624163931}
+  - component: {fileID: 7713261220303834969}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -128,13 +129,6 @@ MonoBehaviour:
   _groundCheck: {x: 0, y: -0.89, z: 0}
   _groundCheckRadius: 0.13
   _isGrounded: 0
-  _wallCheck: {x: 0, y: 0, z: 0}
-  _wallCheckRadius: 0.6
-  _isWalled: 0
-  _leftWall: 0
-  _jumpsLeft: 3
-  _canJump: 1
-  _canJumpAgain: 1
 --- !u!136 &1683016288361077568
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -290,6 +284,22 @@ MonoBehaviour:
   _isTagged: 0
   _canBeTagged: 1
   _taggedParticles: {fileID: 8071717399085638175}
+  OnTagged:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &7713261220303834969
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1683016288361077577}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce69fc17b2c57d3409043e53d4369e9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _text: {fileID: 0}
 --- !u!1 &8359110281466862991
 GameObject:
   m_ObjectHideFlags: 0

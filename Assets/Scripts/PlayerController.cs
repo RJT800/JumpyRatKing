@@ -40,28 +40,6 @@ public class PlayerController : MonoBehaviour
 
     private bool _isGrounded = false;
 
-    [SerializeField]
-    private Vector3 _wallCheck;
-
-
-    [SerializeField]
-    private float _wallCheckRadius;
-
-    [SerializeField]
-    private bool _isWalled = false;
-
-    [SerializeField]
-    private bool _leftWall = false;
-
-
-    [SerializeField]
-    private float _jumpsLeft = 1f;
-
-    [SerializeField]
-    private bool _canJump = true;
-
-    [SerializeField]
-    private bool _canJumpAgain = true;
 
 
 
@@ -79,18 +57,12 @@ public class PlayerController : MonoBehaviour
             Debug.LogError("RigidBody is null!");
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
+
     void Update()
     {
 
 
-        //_moveDirection = new Vector3(Input.GetAxisRaw("P" + (_isPlayerOne ? "1" : "2") + " Hori", 0, 0);
 
         if (_isPlayerOne)
         {
@@ -109,7 +81,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-
+        // prevents potential jump inputs 
         if (_jumpBeenInputted==true)
         {
             if (_jumpInput == false)
@@ -120,10 +92,6 @@ public class PlayerController : MonoBehaviour
         //add movement force
         _rigidbody.AddForce(_moveDirection * _acceleration * Time.fixedDeltaTime, ForceMode.VelocityChange);
 
-        //wall check 
-        _isWalled = Physics.OverlapSphere(transform.position + _wallCheck, _wallCheckRadius).Length > 1;
-
-
         //clamp velocity to _maxspeed
         Vector3 velocity = _rigidbody.velocity;
         float newXSpeed = Mathf.Clamp(_rigidbody.velocity.x, -_maxSpeed, _maxSpeed);
@@ -131,67 +99,16 @@ public class PlayerController : MonoBehaviour
         _rigidbody.velocity = velocity;
 
 
-        if (_isGrounded == true)
-        {
-            _canJump = true;
-            _canJumpAgain = false;
-        }
-        else
-        {
-            _canJump = false;
-        }
-
-        if (_isWalled == true)
-        {
-            _leftWall = false;
-        }
-
-
-
-        if (_isWalled == true && _isGrounded == false)
-        {
-            _canJumpAgain = true;
-
-        }
-        else
-            _canJumpAgain = false;
-
-        //if (_leftWall == true && _isGrounded == false)
-        //{
-        //    _canJumpAgain = true;
-        //}
-        //else
-        //    _canJumpAgain = false;
-
-        //Invoke("_jumpInput", 0.02f);
-
-
-
-
-
-
-
-
-
-
         //add jump force
-        if (_jumpInput == true && _jumpBeenInputted !=true&& _canJump == true || _jumpInput == true && _canJumpAgain == true &&_jumpBeenInputted != true&& _jumpsLeft > 0)
+        if (_jumpInput == true && _jumpBeenInputted !=true &&_isGrounded==true)
         {
 
             //Calculate force needed to reach _jumpHeight
             float force = Mathf.Sqrt(_jumpHeight * -2f * Physics.gravity.y);
             _rigidbody.AddForce(Vector3.up * force, ForceMode.Impulse);
 
-            if (_isGrounded == false)
-                _jumpsLeft--;
-
-
+            
             _jumpBeenInputted = true;
-        }
-
-        if (_isGrounded ==true)
-        {
-            _jumpsLeft = 3;
         }
         
     }
@@ -203,13 +120,8 @@ public class PlayerController : MonoBehaviour
         //draw ground check 
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position + _groundCheck, _groundCheckRadius);
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position + _wallCheck, _wallCheckRadius);
-        
+
     }
 #endif
-    //private void OnTriggerEnter(Collider other)
-    //{
-    //    _isGrounded = true;
-    //}
+
 }
